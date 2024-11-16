@@ -1,0 +1,24 @@
+const express = require("express");
+const app = express();
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+require("dotenv").config();
+
+const PORT = process.env.PORT || 5000;
+
+const corsOptions = {
+  origin: process.env.CLIENT_URL,
+  methods: "GET, POST, PUT, DELETE, PATCH",
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.use(express.json());
+app.use(cookieParser());
+
+app.get("/", (req, res) => {
+  res.status(200).send("Welcome to the page");
+});
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
