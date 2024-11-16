@@ -32,6 +32,40 @@ const register = async (req, res) => {
     res.status(500).json("Server Error");
   }
 };
+// User Sign In or Login
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await user_model.findOne({ email: email });
 
-module.exports = { register };
+    if (!user) {
+      return res.status(404).json({ message: "Invalid credentials." });
+    }
 
+    const confirmPassword = await bcrypt.compare(password, user.password);
+
+    if (confirmPassword) {
+      // Generate JWT Token after successful login
+      const token = await user.generateToken();
+
+      // Set token in HTTP-only cookie
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // Only set secure cookies in production
+        maxAge: 3600000, // 1 hour
+      });
+
+      return res.json({
+        message: "Logged in successfully",
+        userId: user._id.toString(),
+      });
+    } else {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json("Server Error");
+  }
+};
+
+module.exports = { register,login };
