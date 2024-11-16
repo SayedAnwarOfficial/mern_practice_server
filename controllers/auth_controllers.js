@@ -68,4 +68,21 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register,login };
+// Logout (Clear cookies)
+const logout = async (req, res) => {
+  try {
+    // Clear the token cookie
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Only clear cookies in production if secure
+      sameSite: "Strict",
+    });
+
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json("Server Error");
+  }
+};
+
+module.exports = { register, login, logout };
